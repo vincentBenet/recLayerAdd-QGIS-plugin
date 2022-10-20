@@ -29,10 +29,11 @@ from qgis.PyQt.QtWidgets import QAction
 from .resources import *
 # Import the code for the dialog
 from .recLayerAdd_dialog import recLayerAddDialog
-import os.path
+import os
+import re
 from qgis.core import *
 from PyQt5 import *
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem
 
 
 class recLayerAdd:
@@ -191,10 +192,9 @@ class recLayerAdd:
         if self.first_start == True:
             self.first_start = False
             self.dlg = recLayerAddDialog()
-
+        self.load()
         # show the dialog
         self.dlg.show()
-        self.load()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
@@ -203,7 +203,7 @@ class recLayerAdd:
 
     def load(self):
         self.paths = []
-        self.project_path = QgsProject.instance().readPath("./")  # Get current project path
+        self.path = QgsProject.instance().readPath("./")  # Get current project path
         self.lock()  # If the browsed path is not valid, lock the OK button
         # Update of the browsed path label using current project location
         self.update_path_browsed()
@@ -212,9 +212,7 @@ class recLayerAdd:
         # Loading Regex path validation
         pass
         # Scanning the selected path
-        pass
-        # Adding files paths to the table
-        pass
+        self.scan()
         # Loading styles paths of previous scans
         pass
     
@@ -231,15 +229,63 @@ class recLayerAdd:
             # Ajout du styles sur le fichier
     
     def lock(self):
-        self.dlg.button_box.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(not(not os.path.isdir(self.project_path) or self.project_path == "./" or not len(self.paths)))
+        self.path_ok = not(not os.path.isdir(self.path) or self.path == "./")
+        self.dlg.button_box.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(self.path_ok and len(self.paths))
     
     def update_path_browsed(self):
-        self.dlg.label_path_browsed.setText(self.project_path)  # Open a dialog to ask selecting a folder
+        txt = resize_path(self.path)
+        self.dlg.label_path_browsed.setText(txt)  # Open a dialog to ask selecting a folder
 
     def browse(self):
-        self.project_path = str(QFileDialog.getExistingDirectory())
+        self.path = str(QFileDialog.getExistingDirectory())
         self.lock()  # If the browsed path is not valid, lock the OK button
         self.update_path_browsed()
+        self.scan()
 
-def scan(self):
-    pass
+    def scan(self):
+        if self.path_ok:
+            regex = self.dlg.lineEdit_regex.text()
+            for root, dirs, files in os.walk(self.path):
+                for file in files:
+                    path = os.path.join(root, file)
+                    if re.match(regex, path):
+                        self.paths.append(path[len(self.path)+1:])
+        self.paths = sorted(self.paths)
+        self.fill_table()  # Adding files paths to the table
+        
+
+    def fill_table(self):
+        table = self.dlg.tableWidget_paths
+        table.setRowCount(0);
+        for i, path in enumerate(self.paths):
+            table.insertRow(i)
+            table.setItem(i, 0, QTableWidgetItem(resize_path(os.path.basename(path))))
+            table.setItem(i, 1, QTableWidgetItem(resize_path(os.path.dirname(path))))
+            table.setItem(i, 2, QTableWidgetItem(file_size(os.path.join(self.path, path))))
+        table.resizeColumnsToContents()
+
+
+def convert_bytes(num):
+    """
+    this function will convert bytes to MB.... GB... etc
+    """
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if num < 1024.0:
+            return "%3.1f %s" % (num, x)
+        num /= 1024.0
+
+
+def file_size(file_path):
+    """
+    this function will return the file size
+    """
+    if os.path.isfile(file_path):
+        file_info = os.stat(file_path)
+        return convert_bytes(file_info.st_size)
+
+def resize_path(path):
+    if len(path) > 115:
+        txt = f"...{path[-115:]}"
+    else:
+        txt = path
+    return txt

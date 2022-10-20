@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="2" colspan="3">
-    <widget class="QTableWidget" name="tableWidget">
+    <widget class="QTableWidget" name="tableWidget_paths">
      <property name="autoScroll">
       <bool>false</bool>
      </property>
@@ -42,11 +42,6 @@
      <column>
       <property name="text">
        <string>Parent</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Depth</string>
       </property>
      </column>
      <column>
