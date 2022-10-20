@@ -208,7 +208,7 @@ class recLayerAdd:
         # Update of the browsed path label using current project location
         self.update_path_browsed()
         # Adding browse event to pushButton_browse
-        self.dlg.pushButton_browse.clicked.connect(self.browse)
+        self.dlg.pushButton_browse.clicked.connect(lambda: self.browse())
         # Loading Regex path validation
         pass
         # Scanning the selected path
@@ -242,6 +242,13 @@ class recLayerAdd:
             else:
                 layer = QgsVectorLayer(layerpath, layername)
                 index = 0
+            continuer = False
+            for layer_test in QgsProject().instance().mapLayersByName(layername):
+                root_layer = QgsProject.instance().layerTreeRoot().findLayer(layer_test.id())
+                if root_layer and root_layer.parent() == group:
+                    continuer = True
+            if continuer:
+                continue
             QgsProject().instance().addMapLayers([layer], False)
             group.insertLayer(index, layer)
             # Ajout du styles sur le fichier

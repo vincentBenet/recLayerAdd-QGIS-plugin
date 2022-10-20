@@ -112,6 +112,11 @@
      </row>
      <column>
       <property name="text">
+       <string>Hide</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Files selection</string>
       </property>
      </column>
@@ -120,12 +125,12 @@
        <string>Style path</string>
       </property>
      </column>
-     <item row="0" column="0">
+     <item row="0" column="1">
       <property name="text">
        <string>^.*.(tif|tiff)$</string>
       </property>
      </item>
-     <item row="1" column="0">
+     <item row="1" column="1">
       <property name="text">
        <string>^.*.(shp|gpkg)$</string>
       </property>
