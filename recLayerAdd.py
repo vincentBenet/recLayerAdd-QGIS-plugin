@@ -223,9 +223,27 @@ class recLayerAdd:
         pass
         # Saving Regex path validation
         pass
-        # for each path
-            # Ajout des sous-groupes
-            # Ajout du fichiers
+        
+        for path in self.paths:
+            filename = os.path.basename(path)
+            extension = filename.split(".")[-1]
+            layername = filename.split(".")[0]
+            layerpath = os.path.join(self.path, path)
+            group = QgsProject.instance().layerTreeRoot()
+            for group_name in path.split(os.sep)[:-1]:
+                if not group.findGroup(group_name):
+                    group = group.insertGroup(-1, group_name)
+                else:
+                    group = group.findGroup(group_name)
+            # Ajout des layers ou raster dans le group
+            if extension in ["tiff", "tif"]:
+                layer = QgsRasterLayer(layerpath, layername)
+                index = -1
+            else:
+                layer = QgsVectorLayer(layerpath, layername)
+                index = 0
+            QgsProject().instance().addMapLayers([layer], False)
+            group.insertLayer(index, layer)
             # Ajout du styles sur le fichier
     
     def lock(self):
@@ -252,6 +270,7 @@ class recLayerAdd:
                         self.paths.append(path[len(self.path)+1:])
         self.paths = sorted(self.paths)
         self.fill_table()  # Adding files paths to the table
+        self.lock()
         
 
     def fill_table(self):

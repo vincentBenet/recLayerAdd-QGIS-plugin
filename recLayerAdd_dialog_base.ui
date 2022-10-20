@@ -122,12 +122,12 @@
      </column>
      <item row="0" column="0">
       <property name="text">
-       <string>^.(tif|tiff)$</string>
+       <string>^.*.(tif|tiff)$</string>
       </property>
      </item>
      <item row="1" column="0">
       <property name="text">
-       <string>^.(shp|gpkg)$</string>
+       <string>^.*.(shp|gpkg)$</string>
       </property>
      </item>
     </widget>
