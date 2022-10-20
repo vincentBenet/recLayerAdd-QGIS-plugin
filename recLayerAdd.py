@@ -30,6 +30,9 @@ from .resources import *
 # Import the code for the dialog
 from .recLayerAdd_dialog import recLayerAddDialog
 import os.path
+from qgis.core import *
+from PyQt5 import *
+from PyQt5.QtWidgets import QFileDialog
 
 
 class recLayerAdd:
@@ -191,10 +194,52 @@ class recLayerAdd:
 
         # show the dialog
         self.dlg.show()
+        self.load()
         # Run the dialog event loop
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+            self.act()
+
+    def load(self):
+        self.paths = []
+        self.project_path = QgsProject.instance().readPath("./")  # Get current project path
+        self.lock()  # If the browsed path is not valid, lock the OK button
+        # Update of the browsed path label using current project location
+        self.update_path_browsed()
+        # Adding browse event to pushButton_browse
+        self.dlg.pushButton_browse.clicked.connect(self.browse)
+        # Loading Regex path validation
+        pass
+        # Scanning the selected path
+        pass
+        # Adding files paths to the table
+        pass
+        # Loading styles paths of previous scans
+        pass
+    
+    def act(self):
+        # Saving style paths
+        pass
+        # Saving regex styles
+        pass
+        # Saving Regex path validation
+        pass
+        # for each path
+            # Ajout des sous-groupes
+            # Ajout du fichiers
+            # Ajout du styles sur le fichier
+    
+    def lock(self):
+        self.dlg.button_box.button(QtWidgets.QDialogButtonBox.Ok).setEnabled(not(not os.path.isdir(self.project_path) or self.project_path == "./" or not len(self.paths)))
+    
+    def update_path_browsed(self):
+        self.dlg.label_path_browsed.setText(self.project_path)  # Open a dialog to ask selecting a folder
+
+    def browse(self):
+        self.project_path = str(QFileDialog.getExistingDirectory())
+        self.lock()  # If the browsed path is not valid, lock the OK button
+        self.update_path_browsed()
+
+def scan(self):
+    pass
