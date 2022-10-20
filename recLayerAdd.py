@@ -262,10 +262,12 @@ class recLayerAdd:
         self.dlg.label_path_browsed.setText(txt)  # Open a dialog to ask selecting a folder
 
     def browse(self):
+        self.dlg.pushButton_browse.disconnect()
         self.path = str(QFileDialog.getExistingDirectory())
         self.lock()  # If the browsed path is not valid, lock the OK button
         self.update_path_browsed()
         self.scan()
+        self.dlg.pushButton_browse.clicked.connect(lambda: self.browse())
 
     def scan(self):
         if self.path_ok:
