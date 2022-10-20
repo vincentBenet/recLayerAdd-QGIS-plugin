@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/recLayerAdd" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
